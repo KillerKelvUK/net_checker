@@ -17,7 +17,7 @@ while [ $exit_flag -ne 1 ]; do                                                  
                 echo "****Offline at" $(date) "*****" | tee -a $loglocation"/"$logfile
                 ping -4 -I $interface -c 1 8.8.8.8
             fi
-            interval=$((SECONDS+3))
+            interval=$((SECONDS+$NET_CHECKER_INTERVAL))
         fi
     fi
 done
