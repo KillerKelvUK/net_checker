@@ -1,20 +1,24 @@
 #!/bin/bash
 
 interface=eth0
-interval=$((SECONDS+15))
-exit_flag=1
-prev_second=0
+interval=$SECONDS
+exit_flag=0
+prev_second=$((SECONDS-1))
+loglocation=$PWD
+logfile=/net_checker.log
 
-while [ $exit_flag -ne 0 ]; do
-    if [ $SECONDS -gt $prev_second ]; then
+while [ $exit_flag -ne 1 ]; do                                                  #get a perpetual loop going
+    if [ $SECONDS -gt $prev_second ]; then                                      #only consider doing something once a second
         prev_second=$SECONDS
-        if [ $SECONDS -eq $interval ]; then
+        if [ $SECONDS -eq $interval ]; then                                     #do something on the configured interval
             if [ $(cat /sys/class/net/$interface/carrier) = 1 ]; then
                 echo "Online at" $(date)
             elif [ $(cat /sys/class/net/$interface/carrier) = 0 ]; then
-                echo "****Offline at" $(date) "*****"
+                echo "****Offline at" $(date) "*****" >> $loglocation$logfile
+                ping -4 -I $interface -c 1 8.8.8.8
             fi
-            interval=$((SECONDS+15))
+            interval=$((SECONDS+3))
         fi
     fi
 done
+
